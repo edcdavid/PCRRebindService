@@ -1,0 +1,7 @@
+[Unit]
+After=cryptsetup.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rebindDiskOnBoot.sh
+[Install]
+WantedBy=multi-user.target

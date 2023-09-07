@@ -1,0 +1,7 @@
+[Unit]
+DefaultDependencies=no
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/disablePcrOnRebootOrShutdown.sh
+[Install]
+WantedBy=shutdown.target reboot.target halt.target
