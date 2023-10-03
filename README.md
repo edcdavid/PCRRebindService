@@ -1,5 +1,5 @@
 # PCRRebindService
-A set of systemd services to rebind luks disks protected with tpmv2 PCR registers. Also contains previous proof of concept projects. 
+A set of systemd services to rebind luks disks protected with tpmv2 PCR registers. Also contains previous proof of concept projects. This page only describes the coreos-generic folder.
 
 # Overview
 The PCRRebindService goal is to support luks disks encrypted with TPMv2 and PCR registers to protect against the "evil main" attack (https://en.wikipedia.org/wiki/Evil_maid_attack) in the context of cloud computing and with no user interactions. This service supports the case where the host is updated and the PCR registers values that were previously used are changed. The PCRRebindService disables PCR register protection(https://wiki.archlinux.org/title/Trusted_Platform_Module) in the limited scenario of firmware updates. Then after reboot, it refreshes the encrypted disk bindings with the new PCR register values and re-enables the PCR protection. 
@@ -27,4 +27,5 @@ The following support scripts do the following:
 
 #Notes: 
 - only TPMv1 PCR 1 & 7 are tested at this time
-- Does not protect against all possible attack scenarios 
+- does not protect against all possible attack scenarios 
+- the temporary passphrase should be changed
