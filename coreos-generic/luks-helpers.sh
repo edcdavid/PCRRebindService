@@ -151,6 +151,6 @@ isSystemUpdating() {
 #rebinds a given key slot that is configured with PCR for a given device
 rebindPCRentriesOnly() {
     logInfo "Rebinding reservedSlotPresent=$1 device=$2 slot=$3 with PCR IDs=$4 and clevis config=$5"
-    clevis-luks-edit -d $2 -s $3 -c "$5"
+    clevis-luks-regen -d $2 -s $3 -q
     removeReservedSlot $2
 }
