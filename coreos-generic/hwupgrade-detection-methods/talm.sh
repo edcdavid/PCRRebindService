@@ -20,13 +20,14 @@ getHubKubeconfig() {
 # done -> return $TRUE if the ztp-done label is set, $FALSE otherwise
 # running -> return $TRUE if the ztp-running label is set, $FALSE otherwise
 isZtpState() {
+    spokeClusterName=$(hostname --short)
     RESULT=$FALSE
     case $1 in
     "running")
-        RESULT=$(KUBECONFIG=/tmp/kubeconfig-hub oc get managedcluster sno2 -ojson | jq '.metadata.labels["ztp-running"]!=null')
+        RESULT=$(KUBECONFIG=/tmp/kubeconfig-hub oc get managedcluster $(hostname --short) -ojson | jq '.metadata.labels["ztp-running"]!=null')
         ;;
     "done")
-        RESULT=$(KUBECONFIG=/tmp/kubeconfig-hub oc get managedcluster sno2 -ojson | jq '.metadata.labels["ztp-done"]!=null')
+        RESULT=$(KUBECONFIG=/tmp/kubeconfig-hub oc get managedcluster $(hostname --short) -ojson | jq '.metadata.labels["ztp-done"]!=null')
         ;;
     *)
         # Code to execute when no patterns match
