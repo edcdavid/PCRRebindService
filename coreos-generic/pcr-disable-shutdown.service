@@ -1,7 +1,7 @@
-[Unit]
-DefaultDependencies=no
 [Service]
-Type=simple
-ExecStart=/usr/local/bin/disablePcrOnRebootOrShutdown.sh
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/true
+ExecStop=/usr/local/bin/disablePcrOnRebootOrShutdown.sh
 [Install]
-WantedBy=shutdown.target reboot.target halt.target
+WantedBy=multi-user.target

@@ -38,7 +38,7 @@ logInfo() {
 
 # return $TRUE id the temporary reserved slot is configured with a key (to disable PCR protection), returns $FALSE otherwise
 isReservedSlotPresent() {
-    RESULT=$(clevis luks list -d $1 -s $RESERVED_SLOT)
+    RESULT=$(clevis luks list -d $1 -s $RESERVED_SLOT || true)
     if [ -n "$RESULT" ] && [ "$RESULT" == "$CLEVIS_CONFIG_RESERVED_SLOT" ]; then
         logDebug "reserved slot $RESERVED_SLOT is present"
         return $TRUE
@@ -52,18 +52,19 @@ addReservedSlot() {
     logInfo "reservedSlotPresent=$1 device=$2 slot=$3 with PCR IDs=$4 and clevis config=$5"
     if [ $1 == $TRUE ]; then
         logInfo "reserve slot already present, no need to add again"
+        clevis luks list -d $2 || true
         return
     fi
     logInfo "adding reserved slot on device=$device"
     ANYPASS="1234567890"
-    echo -e "$ANYPASS\n" | clevis luks bind -s $RESERVED_SLOT -d $2 tpm2 '{}'
-    clevis luks list -d $2
+    echo -e "$ANYPASS\n" | clevis luks bind -s $RESERVED_SLOT -d $2 tpm2 '{}' || true
+    clevis luks list -d $2 || true
 }
 
 # remove the temporary key in the reserved slot to enable PCR protection
 removeReservedSlot() {
     logInfo "removing luks reserved slot 31 in disk $1"
-    echo "clevis luks unbind -s $RESERVED_SLOT -d $1 -f" | sed 's@/@\/@g' | bash
+    echo "clevis luks unbind -s $RESERVED_SLOT -d $1 -f" | sed 's@/@\/@g' | bash || true
 }
 
 #gets the list of luks devices in the system
@@ -90,7 +91,7 @@ parseClevisConfig() {
 getPcrSlotsForDevice() {
     device=$1
     logDebug "getPcrSlotsForDevice, device=$device"
-    clevis luks list -d $device | grep pcr_ids
+    clevis luks list -d $device | grep pcr_ids || true
 }
 
 parseClevisRegex() {
@@ -121,7 +122,9 @@ processPCRentriesOnly() {
         clevisConfig=${values[4]}
         logInfo "reservedSlot=$reservedSlotPresent device=$device slot=$slotNumber with PCR IDs=$pcrIDs and clevis config=$clevisConfig"
         if [ -n "$pcrIDs" ]; then
-            $1 $reservedSlotPresent $device $slotNumber $pcrIDs $clevisConfig
+            logDebug "before applying command: $(/usr/bin/tpm2_pcrread sha256:$pcrIDs)"
+            $1 $reservedSlotPresent $device $slotNumber $pcrIDs $clevisConfig || true
+            logDebug "after applying command: $(/usr/bin/tpm2_pcrread sha256:$pcrIDs)"
         fi
     done
 }
@@ -151,6 +154,6 @@ isSystemUpdating() {
 #rebinds a given key slot that is configured with PCR for a given device
 rebindPCRentriesOnly() {
     logInfo "Rebinding reservedSlotPresent=$1 device=$2 slot=$3 with PCR IDs=$4 and clevis config=$5"
-    clevis-luks-regen -d $2 -s $3 -q
+    clevis-luks-regen -d $2 -s $3 -q || true
     removeReservedSlot $2
 }

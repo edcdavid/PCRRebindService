@@ -1,7 +1,9 @@
 [Unit]
-After=cryptsetup.target systemd-boot-update.service 
+After=cryptsetup.target systemd-boot-update.service
+Requires=cryptsetup.target systemd-boot-update.service
+RequiredBy=sysinit.target
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/rebindDiskOnBoot.sh
 [Install]
-WantedBy=multi-user.target
+RequiredBy=sysinit.target
